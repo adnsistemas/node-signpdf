@@ -31,6 +31,52 @@ describe(pdflibAddPlaceholder, () => {
             expect(e.message).toMatchInlineSnapshot('"PDFDoc or PDFPage must be set."');
         }
     });
+    it('expects name, contactInfo, reason and location', async () => {
+        const input = readTestResource('w3dummy.pdf');
+        const pdfDoc = await PDFDocument.load(input);
+        try {
+            pdflibAddPlaceholder({
+                pdfDoc,
+            });
+        } catch (e) {
+            expect(e instanceof SignPdfError).toBe(true);
+            expect(e.type).toBe(SignPdfError.TYPE_INPUT);
+            expect(e.message).toMatchInlineSnapshot('"reason, contactInfo, name and location must be set"');
+        }
+        try {
+            pdflibAddPlaceholder({
+                pdfDoc,
+                contactInfo: '',
+            });
+        } catch (e) {
+            expect(e instanceof SignPdfError).toBe(true);
+            expect(e.type).toBe(SignPdfError.TYPE_INPUT);
+            expect(e.message).toMatchInlineSnapshot('"reason, contactInfo, name and location must be set"');
+        }
+        try {
+            pdflibAddPlaceholder({
+                pdfDoc,
+                name: '',
+                reason: '',
+            });
+        } catch (e) {
+            expect(e instanceof SignPdfError).toBe(true);
+            expect(e.type).toBe(SignPdfError.TYPE_INPUT);
+            expect(e.message).toMatchInlineSnapshot('"reason, contactInfo, name and location must be set"');
+        }
+        try {
+            pdflibAddPlaceholder({
+                pdfDoc,
+                name: '',
+                reason: '',
+                contactInfo: '',
+            });
+        } catch (e) {
+            expect(e instanceof SignPdfError).toBe(true);
+            expect(e.type).toBe(SignPdfError.TYPE_INPUT);
+            expect(e.message).toMatchInlineSnapshot('"reason, contactInfo, name and location must be set"');
+        }
+    });
     it('adds placeholder to a prepared document', async () => {
         const input = readTestResource('w3dummy.pdf');
         expect(input.indexOf('/ByteRange')).toBe(-1);

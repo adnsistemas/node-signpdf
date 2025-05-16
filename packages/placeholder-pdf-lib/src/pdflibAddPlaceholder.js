@@ -99,6 +99,12 @@ export const pdflibAddPlaceholder = ({
             SignPdfError.TYPE_INPUT,
         );
     }
+    if (!reason || !contactInfo || !name || !location) {
+        throw new SignPdfError(
+            'reason, contactInfo, name and location must be set',
+            SignPdfError.TYPE_INPUT,
+        );
+    }
     const doc = pdfDoc ?? pdfPage.doc;
     const page = pdfPage ?? (newPageDims ? doc.addPage(newPageDims) : doc.getPages()[0]);
     const timeStamp = signingTime ?? new Date();
