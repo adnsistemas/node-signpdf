@@ -38,10 +38,15 @@ var _pdfLib = require("@adnsistemas/pdf-lib");
  * @property {string} [subFilter] One of SUBFILTER_* from \@signpdf/utils
  * @property {number[]} [widgetRect] [x1, y1, x2, y2] widget rectangle
  * @property {string} [appName] Name of the application generating the signature
- * @property {string} [widgetName] Name to use for the Widget representing the signature, 'Signature1' if not specified
- * @property {string} [signDescription] Descriptive texto to show for widget on visualization, instead of widgetName
- * @property {number[]} [newPageDims] If not specified page[0] is used for signature, otherwise a new page, with this dimensiones is used
- * @property {signaturePDFLibVisualRep} [visualRepresentation] If provided, and new page is generated, is invoked to put the visual representation of the signature, on the new page
+ * @property {string} [widgetName] Name to use for the Widget representing the signature,
+ *  'Signature1' if not specified
+ * @property {string} [signDescription] Descriptive texto to show for widget on visualization,
+ *  instead of widgetName
+ * @property {number[]} [newPageDims] If not specified page[0] is used for signature,
+ *  otherwise a new page, with this dimensiones is used
+ * @property {signaturePDFLibVisualRep} [visualRepresentation] If provided,
+ *  and new page is generated, is invoked to put the visual representation of the signature,
+ *  on the new page
  */
 
 /**
@@ -86,6 +91,9 @@ const pdflibAddPlaceholder = ({
 }) => {
   if (pdfDoc === undefined && pdfPage === undefined) {
     throw new _utils.SignPdfError('PDFDoc or PDFPage must be set.', _utils.SignPdfError.TYPE_INPUT);
+  }
+  if (!reason || !contactInfo || !name || !location) {
+    throw new _utils.SignPdfError('reason, contactInfo, name and location must be set', _utils.SignPdfError.TYPE_INPUT);
   }
   const doc = pdfDoc !== null && pdfDoc !== void 0 ? pdfDoc : pdfPage.doc;
   const page = pdfPage !== null && pdfPage !== void 0 ? pdfPage : newPageDims ? doc.addPage(newPageDims) : doc.getPages()[0];

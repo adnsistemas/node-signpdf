@@ -25,19 +25,24 @@ export type CommonInputType = {
      */
     appName?: string;
     /**
-     * Name to use for the Widget representing the signature, 'Signature1' if not specified
+     * Name to use for the Widget representing the signature,
+     * 'Signature1' if not specified
      */
     widgetName?: string;
     /**
-     * Descriptive texto to show for widget on visualization, instead of widgetName
+     * Descriptive texto to show for widget on visualization,
+     * instead of widgetName
      */
     signDescription?: string;
     /**
-     * If not specified page[0] is used for signature, otherwise a new page, with this dimensiones is used
+     * If not specified page[0] is used for signature,
+     * otherwise a new page, with this dimensiones is used
      */
     newPageDims?: number[];
     /**
-     * If provided, and new page is generated, is invoked to put the visual representation of the signature, on the new page
+     * If provided,
+     * and new page is generated, is invoked to put the visual representation of the signature,
+     * on the new page
      */
     visualRepresentation?: signaturePDFLibVisualRep;
 };
