@@ -195,7 +195,7 @@ const pdflibAddPlaceholder = ({
   const updatedFlags = _pdfLib.PDFNumber.of(sigFlags.asNumber() | _utils.SIG_FLAGS.SIGNATURES_EXIST | _utils.SIG_FLAGS.APPEND_ONLY);
   acroForm.dict.set(_pdfLib.PDFName.of('SigFlags'), updatedFlags);
   let fields = acroForm.dict.get(_pdfLib.PDFName.of('Fields'));
-  if (!(fields instanceof _pdfLib.PDFArray)) {
+  if (!(0, _pdfLib.isPDFInstance)(fields, _pdfLib.PDFClasses.PDFArray)) {
     fields = doc.context.obj([]);
     acroForm.dict.set(_pdfLib.PDFName.of('Fields'), fields);
   }
