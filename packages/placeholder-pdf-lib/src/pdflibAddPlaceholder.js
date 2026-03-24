@@ -7,7 +7,8 @@ import {
     SignPdfError,
 } from '@signpdf/utils';
 import {
-    PDFArray, PDFHexString, PDFName, PDFNumber, PDFInvalidObject, PDFString,
+    PDFArray, PDFHexString, PDFName, PDFNumber,
+    PDFInvalidObject, PDFString, isPDFInstance, PDFClasses,
 } from '@adnsistemas/pdf-lib';
 
 /**
@@ -197,7 +198,7 @@ export const pdflibAddPlaceholder = ({
     );
     acroForm.dict.set(PDFName.of('SigFlags'), updatedFlags);
     let fields = acroForm.dict.get(PDFName.of('Fields'));
-    if (!(fields instanceof PDFArray)) {
+    if (!isPDFInstance(fields, PDFClasses.PDFArray)) {
         fields = doc.context.obj([]);
         acroForm.dict.set(PDFName.of('Fields'), fields);
     }

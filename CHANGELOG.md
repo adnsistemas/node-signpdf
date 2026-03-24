@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [3.2.11]
+
+- [placeholder-pdf-lib] Change library @adnsistemas/pdf-lib to version >= 2.9.0 (with isPDFInstance function)
+
 ## [3.2.7]
 
 - [placeholder-pdf-lib] Change library to @adnsistemas/pdf-lib

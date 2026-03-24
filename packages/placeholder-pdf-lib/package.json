@@ -1,6 +1,6 @@
 {
     "name": "@adnsistemas/placeholder-pdf-lib",
-    "version": "3.2.10",
+    "version": "3.2.11",
     "description": "Use PDF-LIB (with incremental updates) to insert a signature placeholder.",
     "repository": {
         "type": "git",
@@ -52,10 +52,10 @@
         "@signpdf/utils": "^3.2.4"
     },
     "peerDependencies": {
-        "@adnsistemas/pdf-lib": ">=1.18.0"
+        "@adnsistemas/pdf-lib": ">=2.9.0"
     },
     "devDependencies": {
-        "@adnsistemas/pdf-lib": ">=1.18.0",
+        "@adnsistemas/pdf-lib": ">=2.9.0",
         "@babel/cli": "^7.0.0",
         "@babel/core": "^7.4.0",
         "@babel/eslint-parser": "^7.16.3",
