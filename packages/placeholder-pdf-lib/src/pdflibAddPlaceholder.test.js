@@ -1,5 +1,16 @@
 import {
-    PDFArray, PDFDict, PDFDocument, PDFName, PDFObjectParser, PDFStream, PDFString,
+    degrees,
+    drawText,
+    PDFArray,
+    PDFContentStream,
+    PDFDict,
+    PDFDocument,
+    PDFName,
+    PDFObjectParser,
+    PDFStream,
+    PDFString,
+    rgb,
+    StandardFonts,
 } from '@adnsistemas/pdf-lib';
 import {readTestResource} from '@signpdf/internal-utils';
 import {DEFAULT_BYTE_RANGE_PLACEHOLDER, SUBFILTER_ETSI_CADES_DETACHED, SignPdfError} from '@signpdf/utils';
@@ -483,24 +494,6 @@ describe(pdflibAddPlaceholder, () => {
         expect(fields.size()).toBe(1);
     });
 
-    it('creates a new page when dims are provided', async () => {
-        const input = readTestResource('w3dummy.pdf');
-        const pdfDoc = await PDFDocument.load(input, {forIncrementalUpdate: true});
-        const ipc = pdfDoc.getPages().length;
-
-        pdflibAddPlaceholder({
-            pdfDoc,
-            ...defaults,
-            newPageDims: [500, 500],
-        });
-
-        const newipc = pdfDoc.getPages().length;
-        const newpage = pdfDoc.getPage(newipc - 1);
-        expect(newipc).toBe(ipc + 1);
-        expect(newpage.getWidth()).toBe(500);
-        expect(newpage.getHeight()).toBe(500);
-    });
-
     it('sets the widget description when provided', async () => {
         const input = readTestResource('w3dummy.pdf');
         const pdfDoc = await PDFDocument.load(input, {forIncrementalUpdate: true});
@@ -519,31 +512,47 @@ describe(pdflibAddPlaceholder, () => {
         expect(widgetDict.get(PDFName.of('TU'))).toEqual(PDFString.of('Description Test'));
     });
 
-    it('sets the visual representation, when function is provided', async () => {
+    it('sets the visual representation, when provided', async () => {
         const input = readTestResource('w3dummy.pdf');
         const pdfDoc = await PDFDocument.load(input, {forIncrementalUpdate: true});
 
-        let called = 0;
+        const ef = await pdfDoc.embedFont(StandardFonts.Courier);
         pdflibAddPlaceholder({
             pdfDoc,
             ...defaults,
-            newPageDims: [500, 500],
-            visualRepresentation: (
-                doc,
-                pdfPage,
-                /* reason,
-                contactInfo,
-                name,
-                location,
-                signingTime, */
-            ) => {
-                pdfPage.drawText('Visual Representation', {x: 50, y: 50});
-                called += 1;
-            },
+            widgetName: 'SignTest1',
+            signDescription: 'Description Test',
+            widgetRect: [10, 20, 200, 200],
+            visualRepresentation: PDFContentStream.of(pdfDoc.context.obj({
+                Type: 'XObject',
+                Subtype: 'Form',
+                FormType: 1,
+                BBox: [10, 20, 200, 200],
+                Resources: pdfDoc.context.obj({
+                    Font: pdfDoc.context.obj({
+                        F0: ef.ref,
+                    }),
+                }),
+            }), [
+                ...drawText(ef.encodeText('Prueba de Apariencia'), {
+                    color: rgb(0, 0, 0),
+                    font: 'F0',
+                    size: 12,
+                    rotate: degrees(0),
+                    xSkew: degrees(0),
+                    ySkew: degrees(0),
+                    x: 120,
+                    y: 80,
+                }),
+            ]),
         });
-        const newpage = pdfDoc.getPage(pdfDoc.getPages().length - 1);
-        expect(newpage.getWidth()).toBe(500);
-        expect(newpage.getHeight()).toBe(500);
-        expect(called).toBe(1);
+        const annotations = pdfDoc
+            .getPage(pdfDoc.getPageCount() - 1).node
+            .lookup(PDFName.of('Annots'), PDFArray);
+        const widgetDict = annotations.lookup(annotations.size() - 1, PDFDict);
+        expect(widgetDict.get(PDFName.of('TU'))).toEqual(PDFString.of('Description Test'));
+        const ap = widgetDict.get(PDFName.of('AP'));
+        expect(ap).not.toBe(undefined);
+        expect(ap.get(PDFName.of('N')).toString()).toMatch('0 R');
     });
 });

@@ -20,19 +20,13 @@ import {
  */
 
 /**
- * @typedef {( pdfDoc,
- *             pdfPage,
- *             reason,
- *             contactInfo,
- *             name,
- *             location,
- *             signingTime) => void} signaturePDFLibVisualRep
+ * @typedef {import('@adnsistemas/pdf-lib').PDFContentStream} PDFContentStream
  */
 
 /**
  * @typedef {object} CommonInputType
  * @property {PDFDocument} [pdfDoc]
- * @property {PDFPage} [pdfPage]
+ * @property {PDFPage} [pdfPage] If not provided, last page is used
  * @property {string} reason
  * @property {string} contactInfo
  * @property {string} name
@@ -45,13 +39,10 @@ import {
  * @property {string} [appName] Name of the application generating the signature
  * @property {string} [widgetName] Name to use for the Widget representing the signature,
  *  'Signature1' if not specified
- * @property {string} [signDescription] Descriptive texto to show for widget on visualization,
+ * @property {string} [signDescription] Descriptive text to show for widget on visualization,
  *  instead of widgetName
- * @property {number[]} [newPageDims] If not specified page[0] is used for signature,
- *  otherwise a new page, with this dimensiones is used
- * @property {signaturePDFLibVisualRep} [visualRepresentation] If provided,
- *  and new page is generated, is invoked to put the visual representation of the signature,
- *  on the new page
+ * @property {PDFContentStream} [visualRepresentation] Visual presentation of the signature
+ * when widgetRect is provided
  */
 
 /**
@@ -91,7 +82,6 @@ export const pdflibAddPlaceholder = ({
     appName = undefined,
     widgetName = undefined,
     signDescription = undefined,
-    newPageDims = undefined,
     visualRepresentation = undefined,
 }) => {
     if (pdfDoc === undefined && pdfPage === undefined) {
@@ -107,11 +97,16 @@ export const pdflibAddPlaceholder = ({
         );
     }
     const doc = pdfDoc ?? pdfPage.doc;
-    const page = pdfPage ?? (newPageDims ? doc.addPage(newPageDims) : doc.getPages()[0]);
+    const page = pdfPage ?? doc.getPages()[doc.getPageCount() - 1];
     const timeStamp = signingTime ?? new Date();
-    if (newPageDims && visualRepresentation) {
-        visualRepresentation(doc, page, reason, contactInfo, name, location, timeStamp);
-    }
+    // Create the signature widget
+    const rect = PDFArray.withContext(doc.context);
+    widgetRect.forEach((c) => rect.push(PDFNumber.of(c)));
+    const wrd = widgetRect.findIndex((wre) => wre > 0) >= 0;
+    const apStream = !wrd || !visualRepresentation ? doc.context.formXObject([], {
+        BBox: widgetRect,
+        Resources: {}, // Necessary to avoid Acrobat bug (see https://stackoverflow.com/a/73011571)
+    }) : visualRepresentation;
     // Create a placeholder where the the last 3 parameters of the
     // actual range will be replaced when signing is done.
     const byteRange = PDFArray.withContext(doc.context);
@@ -148,13 +143,6 @@ export const pdflibAddPlaceholder = ({
     const signatureObj = PDFInvalidObject.of(signatureBuffer);
     const signatureDictRef = doc.context.register(signatureObj);
 
-    // Create the signature widget
-    const rect = PDFArray.withContext(doc.context);
-    widgetRect.forEach((c) => rect.push(PDFNumber.of(c)));
-    const apStream = doc.context.formXObject([], {
-        BBox: widgetRect,
-        Resources: {}, // Necessary to avoid Acrobat bug (see https://stackoverflow.com/a/73011571)
-    });
     const widgetDict = doc.context.obj({
         Type: 'Annot',
         Subtype: 'Widget',

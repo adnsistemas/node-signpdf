@@ -1,9 +1,12 @@
-export function pdflibAddPlaceholder({ pdfDoc, pdfPage, reason, contactInfo, name, location, signingTime, signatureLength, byteRangePlaceholder, subFilter, widgetRect, appName, widgetName, signDescription, newPageDims, visualRepresentation, }: InputType): void;
+export function pdflibAddPlaceholder({ pdfDoc, pdfPage, reason, contactInfo, name, location, signingTime, signatureLength, byteRangePlaceholder, subFilter, widgetRect, appName, widgetName, signDescription, visualRepresentation, }: InputType): void;
 export type PDFDocument = import('@adnsistemas/pdf-lib').PDFDocument;
 export type PDFPage = import('@adnsistemas/pdf-lib').PDFPage;
-export type signaturePDFLibVisualRep = (pdfDoc: any, pdfPage: any, reason: any, contactInfo: any, name: any, location: any, signingTime: any) => void;
+export type PDFContentStream = import('@adnsistemas/pdf-lib').PDFContentStream;
 export type CommonInputType = {
     pdfDoc?: PDFDocument;
+    /**
+     * If not provided, last page is used
+     */
     pdfPage?: PDFPage;
     reason: string;
     contactInfo: string;
@@ -30,21 +33,15 @@ export type CommonInputType = {
      */
     widgetName?: string;
     /**
-     * Descriptive texto to show for widget on visualization,
+     * Descriptive text to show for widget on visualization,
      * instead of widgetName
      */
     signDescription?: string;
     /**
-     * If not specified page[0] is used for signature,
-     * otherwise a new page, with this dimensiones is used
+     * Visual presentation of the signature
+     * when widgetRect is provided
      */
-    newPageDims?: number[];
-    /**
-     * If provided,
-     * and new page is generated, is invoked to put the visual representation of the signature,
-     * on the new page
-     */
-    visualRepresentation?: signaturePDFLibVisualRep;
+    visualRepresentation?: PDFContentStream;
 };
 export type DocInputType = {
     pdfDoc: PDFDocument;
