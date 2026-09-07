@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## [3.3.0]
+
+- [placeholder-pdf-lib] Visual appearance of signatures modified to adhere to PDF standard
+
 ## [3.2.11]
 
 - [placeholder-pdf-lib] Change library @adnsistemas/pdf-lib to version >= 2.9.0 (with isPDFInstance function)
